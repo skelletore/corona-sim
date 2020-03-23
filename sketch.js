@@ -116,7 +116,7 @@ function initialiseDOM() {
 
 function initializePopulation() {
   randomSeed(sliders.seed.value())
-
+  hist = []
   peeps = []
   let stationary = sliders.stationary.value(),
     immunity = sliders.immunity.value(),
@@ -149,7 +149,7 @@ function draw() {
   let yoffset = drawSliders()
   if (sim) simulate()
   peeps.forEach(p => p.draw())
-  stats()
+  stats(yoffset + 6 * gridPadding)
 }
 
 function drawSliders() {
@@ -207,36 +207,38 @@ function isNeighbor(a, b) {
 }
 
 function stats(yoffset) {
-  let xoffset = gridSize + gridPadding,
+  let xoffset = gridSize + gridPadding * 4,
     width = 300,
     height = 150,
     num = sliders.num.value()
 
-  fill(0)
-  rect(gridSize + gridPadding, yoffset, width, height)
-  let lineOffset = 0
-  let lineLength
+  fill(255)
+  noStroke()
+  rect(xoffset, yoffset, width, height)
+  stroke(0)
   for (let h of hist) {
-    xoffset++
-
+    let lineOffset = yoffset
+    let lineLength
+    xoffset += 1
+    strokeWeight(2)
     stroke(healthyCol)
     lineLength = (h.healthy / num) * height
-    line(xoffset, yoffset + lineOffset, xoffset, lineOffset + lineLength)
+    line(xoffset, lineOffset, xoffset, lineOffset + lineLength)
     lineOffset += lineLength
 
     stroke(sickCol)
     lineLength = (h.sick / num) * height
-    line(xoffset, yoffset + lineOffset, xoffset, lineOffset + lineLength)
+    line(xoffset, lineOffset, xoffset, lineOffset + lineLength)
     lineOffset += lineLength
 
     stroke(immuneCol)
     lineLength = (h.immune / num) * height
-    line(xoffset, yoffset + lineOffset, xoffset, lineOffset + lineLength)
+    line(xoffset, lineOffset, xoffset, lineOffset + lineLength)
     lineOffset += lineLength
 
     stroke(deadCol)
     lineLength = (h.dead / num) * height
-    line(xoffset, yoffset + lineOffset, xoffset, lineOffset + lineLength)
+    line(xoffset, lineOffset, xoffset, lineOffset + lineLength)
     lineOffset += lineLength
   }
 }
