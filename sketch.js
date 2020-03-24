@@ -143,7 +143,7 @@ function setup() {
 }
 
 function draw() {
-  background(120)
+  background(100)
   fill('white')
   rect(gridPadding, gridPadding, gridSize, gridSize)
   let yoffset = drawSliders()
@@ -177,9 +177,6 @@ function simulate() {
     sick: peeps.filter(p => p.alive && p.sick && !p.immune).length,
     immune: peeps.filter(p => p.immune).length
   }
-  // console.log(
-  //   `healthy: ${newHist.healthy}, sick: ${newHist.sick}, immune: ${newHist.immune}, dead: ${newHist.dead}, `
-  // )
   hist.push(newHist)
 }
 
@@ -207,11 +204,27 @@ function isNeighbor(a, b) {
 }
 
 function stats(yoffset) {
+  const histLabel = ['healthy', 'sick', 'immune', 'dead']
+
   let xoffset = gridSize + gridPadding * 4,
     width = 300,
     height = 150,
-    num = sliders.num.value()
-
+    num = sliders.num.value(),
+    labelPadding = 0
+  // legend
+  for (let h of histLabel) {
+    let col = eval(h + 'Col')
+    fill(col)
+    rect(xoffset + labelPadding, yoffset, gridPadding, gridPadding)
+    fill(255)
+    text(h, xoffset + labelPadding + gridPadding * 2, yoffset + gridPadding)
+    labelPadding += gridPadding * 7
+  }
+  noFill()
+  yoffset += gridPadding * 3
+  if (hist.length >= width) {
+    hist.splice(0, 1)
+  }
   fill(255)
   noStroke()
   rect(xoffset, yoffset, width, height)
@@ -241,4 +254,5 @@ function stats(yoffset) {
     line(xoffset, lineOffset, xoffset, lineOffset + lineLength)
     lineOffset += lineLength
   }
+  strokeWeight(2)
 }
