@@ -209,7 +209,7 @@ function stats(yoffset) {
   let xoffset = gridSize + gridPadding * 4,
     width = 300,
     height = 150,
-    num = sliders.num.value(),
+    num = peeps.length,
     labelPadding = 0
   // legend
   for (let h of histLabel) {
