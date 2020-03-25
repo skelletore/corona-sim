@@ -1,8 +1,8 @@
 let seed, num
-const gridSize = 500
+const gridSize = 800
 const gridPadding = 10
 const frameR = 8
-const CANVASWIDTH = 900
+const CANVASWIDTH = 1200
 const CANVASHEIGHT = gridSize + 2 * gridPadding
 
 let sim = false
@@ -24,7 +24,7 @@ let sliderConfig = [
     name: 'num',
     value: 200,
     min: 0,
-    max: 400,
+    max: Math.floor(Math.pow(gridSize / gridPadding, 2) / 2),
     step: 10
   },
   {
@@ -40,6 +40,13 @@ let sliderConfig = [
     min: 0,
     max: 1,
     step: 0.05
+  },
+  {
+    name: 'transfer',
+    value: 0.9,
+    min: 0,
+    max: 1,
+    step: 0.01
   },
   {
     name: 'immunity',
@@ -123,6 +130,7 @@ function initializePopulation() {
     sickProb = sliders.sick.value(),
     daysSick = sliders.daysSick.value(),
     lethality = sliders.lethality.value(),
+    transfer = sliders.transfer.value(),
     num = sliders.num.value()
 
   let startPos = randomStart(num, gridSize / gridPadding, gridSize / gridPadding)
@@ -130,7 +138,17 @@ function initializePopulation() {
     let stat = random() < stationary
     let immune = random() < immunity
     let sick = random() < sickProb
-    let peep = new Peep(gridPadding, p.x, p.y, stat, immune, sick, daysSick, lethality)
+    let peep = new Peep(
+      gridPadding,
+      p.x,
+      p.y,
+      stat,
+      immune,
+      sick,
+      daysSick,
+      lethality,
+      transfer
+    )
     peeps.push(peep)
   }
 }
@@ -198,9 +216,9 @@ function randint(ma, mi = 0) {
 
 function isNeighbor(a, b) {
   // taxi
-  // return (Math.abs(a.x - b.x) + Math.abs(a.y - b.y)) < 2 * gridPadding
+  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y) < 2 * gridPadding
   // euclidean
-  return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2)) < 2 * gridPadding
+  // return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2)) < 2 * gridPadding
 }
 
 function stats(yoffset) {
@@ -210,7 +228,8 @@ function stats(yoffset) {
     width = 300,
     height = 150,
     num = peeps.length,
-    labelPadding = 0
+    labelPadding = 0,
+    grafyoffset = yoffset + height + gridPadding * 4
   // legend
   for (let h of histLabel) {
     let col = eval(h + 'Col')
@@ -228,12 +247,14 @@ function stats(yoffset) {
   fill(255)
   noStroke()
   rect(xoffset, yoffset, width, height)
+  rect(xoffset, grafyoffset, width, height)
   stroke(0)
   for (let h of hist) {
-    let lineOffset = yoffset
+    let lineOffset = yoffset + 1
+    let dotOffset = grafyoffset - 1
     let lineLength
     xoffset += 1
-    strokeWeight(2)
+    strokeWeight(1)
     stroke(healthyCol)
     lineLength = (h.healthy / num) * height
     line(xoffset, lineOffset, xoffset, lineOffset + lineLength)
@@ -242,6 +263,8 @@ function stats(yoffset) {
     stroke(sickCol)
     lineLength = (h.sick / num) * height
     line(xoffset, lineOffset, xoffset, lineOffset + lineLength)
+    fill(sickCol)
+    rect(xoffset, dotOffset + height - lineLength, 1, 1)
     lineOffset += lineLength
 
     stroke(immuneCol)
@@ -254,5 +277,6 @@ function stats(yoffset) {
     line(xoffset, lineOffset, xoffset, lineOffset + lineLength)
     lineOffset += lineLength
   }
+
   strokeWeight(2)
 }

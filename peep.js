@@ -12,13 +12,15 @@ class Peep {
     immune = false,
     sick = false,
     daysSick = 30,
-    lethality = 0.01
+    lethality = 0.01,
+    transfer = 1
   ) {
     this.alive = true
     this.padding = padding
     this.x = x * padding
     this.y = y * padding
     this.stationary = stationary
+    this.transferProb = transfer
     this.sick = sick
     this.daysSick = daysSick
     if (this.sick) this.sickDay = 0
@@ -43,7 +45,8 @@ class Peep {
       !this.sick &&
       others.filter(o => {
         return o.sick && !o.immune && o.alive
-      }).length
+      }).length &&
+      random() <= this.transferProb
     ) {
       this.sick = true
       this.sickDay = 0
